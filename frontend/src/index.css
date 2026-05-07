@@ -1,0 +1,119 @@
+/* @import './project-management.css'; */
+@import 'tailwindcss';
+@variant dark (&:is(.dark *));
+
+@theme {
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+
+  --color-surface: #0b0f19;
+  --color-surface-card: #111827;
+  --color-surface-border: #1f2937;
+  --color-surface-hover: #1e293b;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-white font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-600;
+  }
+}
+
+.card {
+  @apply bg-surface-card border border-surface-border rounded-2xl;
+}
+
+.btn-primary {
+  @apply bg-brand-600 hover:bg-brand-500 text-white font-semibold px-4 py-2 rounded-xl
+         transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2
+         focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface;
+}
+
+.btn-secondary {
+  @apply bg-surface-hover hover:bg-surface-border text-white font-medium px-4 py-2 rounded-xl
+         border border-surface-border transition-all duration-200 active:scale-95
+         focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface;
+}
+
+.btn-ghost {
+  @apply text-gray-400 hover:text-white hover:bg-surface-hover px-3 py-2 rounded-xl
+         transition-all duration-200 focus:outline-none;
+}
+
+.input-field {
+  @apply bg-surface-hover border border-surface-border rounded-xl px-4 py-2.5 text-white
+         placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-1
+         focus:ring-brand-500 transition-all duration-200 w-full;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+}
+
+.badge-beginner {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+}
+.badge-intermediate {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20;
+}
+.badge-advanced {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20;
+}
+
+.progress-bar {
+  @apply h-1.5 rounded-full bg-surface-border overflow-hidden;
+}
+.progress-fill {
+  @apply h-full rounded-full bg-gradient-to-r from-brand-500 to-violet-500 transition-all duration-500;
+}
+
+.nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white
+         hover:bg-surface-hover transition-all duration-200 cursor-pointer text-sm font-medium;
+}
+.nav-item.active {
+  @apply bg-brand-600/20 text-brand-300 border border-brand-600/30;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-brand-400 to-violet-400 bg-clip-text text-transparent;
+}
+.glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+.glow-sm {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
