@@ -1,7 +1,6 @@
 import api from '../lib/axios'
 import type { Course, Cohort, DiscussionPost } from '../types'
 
-// ─── Courses ─────────────────────────────────────────────────────────────────
 export const courseApi = {
   getAll: (params?: { page?: number; limit?: number; category?: string; search?: string; cohortId?: string }) =>
     api.get('/courses', { params }),
@@ -18,7 +17,6 @@ export const courseApi = {
   getProgress: (courseId: string) => api.get(`/courses/${courseId}/progress`),
 }
 
-// ─── Cohorts ─────────────────────────────────────────────────────────────────
 export const cohortApi = {
   getAll: () => api.get('/cohorts'),
   getById: (id: string) => api.get(`/cohorts/${id}`),
@@ -27,7 +25,6 @@ export const cohortApi = {
   getMyCohorts: () => api.get('/cohorts/me/enrolled'),
 }
 
-// ─── Discussion ───────────────────────────────────────────────────────────────
 export const discussionApi = {
   getAll: (params?: { cohortId?: string; courseId?: string; page?: number }) =>
     api.get('/discussions', { params }),
@@ -44,7 +41,6 @@ export const discussionApi = {
   delete: (id: string) => api.delete(`/discussions/${id}`),
 }
 
-// ─── Leaderboard ─────────────────────────────────────────────────────────────
 export const leaderboardApi = {
   getGlobal: () => api.get('/lms-leaderboard'),
   getCohort: (cohortId: string) => api.get(`/lms-leaderboard/cohort/${cohortId}`),

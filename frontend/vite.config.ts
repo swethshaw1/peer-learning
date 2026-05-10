@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'https://peer-leaning-backend.onrender.com',
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5050',
         changeOrigin: true,
       },
     },

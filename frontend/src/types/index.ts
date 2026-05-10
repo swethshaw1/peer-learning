@@ -51,6 +51,7 @@ export interface Cohort {
 
 export interface Role {
   id: string;
+  _id?: string;
   title: string;
   description: string;
   skillsRequired: string[];
@@ -60,6 +61,7 @@ export interface Role {
 
 export interface Milestone {
   id: string;
+  _id?: string;
   name: string;
   description: string;
   status: 'completed' | 'in-progress' | 'pending';
@@ -69,6 +71,7 @@ export interface Milestone {
 
 export interface Project {
   id: string;
+  _id?: string;
   title: string;
   pitch: string;
   description: string;
@@ -88,6 +91,7 @@ export interface Project {
 
 export interface Application {
   id: string;
+  _id?: string;
   userId: string;
   projectId: string;
   roleId: string;
@@ -100,6 +104,7 @@ export interface Application {
 
 export interface Feedback {
   id: string;
+  _id?: string;
   submissionId: string;
   authorId: string;
   comment: string;

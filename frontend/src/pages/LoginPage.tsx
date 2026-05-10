@@ -30,13 +30,10 @@ export default function LoginPage() {
 
   const DEMO_ACCOUNTS = [
     { name: "Alice", email: "alice@peer.dev", role: "Student", avatar: "bg-violet-500" },
-    { name: "Aarav Sharma", email: "aarav.sharma@example.com", role: "Student", avatar: "bg-violet-500" },
-    { name: "Priya Verma", email: "priya.verma@example.com", role: "Student", avatar: "bg-pink-500" },
-    { name: "Rohan Mehta", email: "rohan.mehta@example.com", role: "Student", avatar: "bg-blue-500" },
-    { name: "Sneha Kapoor", email: "sneha.kapoor@example.com", role: "Student", avatar: "bg-green-500" },
-    { name: "Aditya Rao", email: "aditya.rao@example.com", role: "Student", avatar: "bg-yellow-500" },
-    { name: "Kavya Nair", email: "kavya.nair@example.com", role: "Student", avatar: "bg-indigo-500" },
-    { name: "Vikram Singh", email: "vikram.singh@example.com", role: "Student", avatar: "bg-red-500" },
+    { name: "Sneha Kapoor", email: "sneha@example.com", role: "Student", avatar: "bg-green-500" },
+    { name: "Aditya Rao", email: "aditya@example.com", role: "Student", avatar: "bg-yellow-500" },
+    { name: "Kavya Nair", email: "kavya@example.com", role: "Student", avatar: "bg-indigo-500" },
+    { name: "Vikram Singh", email: "vikram@example.com", role: "Student", avatar: "bg-red-500" },
   ];
 
   useEffect(() => {
@@ -116,7 +113,7 @@ export default function LoginPage() {
 
   const selectDemoAccount = (accEmail: string) => {
     setEmail(accEmail);
-    setPassword("Demo!1234");
+    setPassword("Demo!123");
     setErrorMsg("");
     setIsDemoModalOpen(false);
   };

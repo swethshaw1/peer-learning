@@ -24,6 +24,7 @@ import {
   ExternalLink,
   MessageSquare,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useCohort } from "../context/CohortContext";
 import { useAuthStore } from "../store/authStore";
@@ -33,7 +34,7 @@ import { formatDate } from "../utils/helpers";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { activeCohort, cohortData, isLoading: cohortLoading, refreshData: refreshCohort } = useCohort();
+  const { activeCohort, allCohorts, cohortData, isLoading: cohortLoading, refreshData: refreshCohort } = useCohort();
   const { user } = useAuthStore();
   const { projects, tasks, activities, isLoading: projectLoading, refreshData: refreshProjects } = useProject();
 
@@ -65,8 +66,9 @@ export default function Dashboard() {
 
     const fetchDashboardData = async () => {
       try {
+        const cohortId = allCohorts.find(c => c.name === activeCohort)?._id;
         const [leadRes, roomRes, actRes, dashRes, courseRes] = await Promise.all([
-          leaderboardApi.getCohort(activeCohort),
+          leaderboardApi.getCohort(cohortId || activeCohort),
           dashboardApi.getActiveRooms(),
           dashboardApi.getActivity(user._id),
           dashboardApi.getDashboardStats(user._id),
@@ -109,24 +111,73 @@ export default function Dashboard() {
     fetchDashboardData();
   }, [refreshCohort, refreshProjects, activeCohort, user]);
 
-  const displayTopics = useMemo(() => {
-    return topicProgress[activeCohort]?.length > 0
-      ? topicProgress[activeCohort]
-      : cohortData[activeCohort] || [];
-  }, [topicProgress, activeCohort, cohortData]);
+  const combinedActivityData = useMemo(() => {
+    const data = { ...activityData };
+    
+    // Add Project Activities
+    if (activities && activities.length > 0) {
+      activities.forEach((act: any) => {
+        try {
+          const d = new Date(act.timestamp);
+          const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          // Give points for different project activities
+          const points = act.type === 'task_submitted' ? 10 : 
+                        act.type === 'milestone_completed' ? 20 : 5;
+          data[date] = (data[date] || 0) + points;
+        } catch (e) {
+          console.error("Error parsing activity date", e);
+        }
+      });
+    }
+
+    return data;
+  }, [activityData, activities]);
+
+  const unifiedCurriculum = useMemo(() => {
+    const quizTopics = (topicProgress[activeCohort] || []).map((t: any) => ({ 
+      ...t, 
+      type: 'quiz',
+      unifiedId: `quiz-${t._id || t.id}` 
+    }));
+
+    const lmsModules = enrolledCourses.flatMap((course: any) => 
+      (course.modules || []).map((mod: any) => ({
+        _id: mod._id,
+        id: mod._id,
+        title: mod.title,
+        courseTitle: course.title,
+        courseId: course._id,
+        type: 'lms',
+        unifiedId: `lms-${mod._id}`,
+        theoryCompleted: mod.lessons?.every((l: any) => l.isCompleted) || false,
+        completedItems: mod.lessons?.filter((l: any) => l.isCompleted).length || 0,
+        totalItems: mod.lessons?.length || 0,
+        progress: mod.lessons?.length > 0 
+          ? Math.round((mod.lessons.filter((l: any) => l.isCompleted).length / mod.lessons.length) * 100) 
+          : 0
+      }))
+    );
+
+    // Sort or filter as needed, but for now just combine
+    return [...quizTopics, ...lmsModules];
+  }, [topicProgress, activeCohort, enrolledCourses]);
 
   const stats = useMemo(() => {
-    const total = displayTopics.length;
-    let totalAccuracy = 0;
-    displayTopics.forEach((t: any) => {
-      if (t.totalQuestions > 0) totalAccuracy += (t.solvedQuestions / t.totalQuestions) * 100;
+    const total = unifiedCurriculum.length;
+    let totalProgress = 0;
+    unifiedCurriculum.forEach((t: any) => {
+      if (t.type === 'quiz') {
+        if (t.totalQuestions > 0) totalProgress += (t.solvedQuestions / t.totalQuestions) * 100;
+      } else {
+        totalProgress += t.progress || 0;
+      }
     });
     return {
       total,
-      quizzesDone: displayTopics.filter((t: any) => t.solvedQuestions > 0).length,
-      avgQuizScore: total > 0 ? Math.round(totalAccuracy / total) : 0,
+      quizzesDone: unifiedCurriculum.filter((t: any) => (t.solvedQuestions > 0 || t.progress > 0)).length,
+      avgQuizScore: total > 0 ? Math.round(totalProgress / total) : 0,
     };
-  }, [displayTopics]);
+  }, [unifiedCurriculum]);
 
   if (cohortLoading || projectLoading) return <LoadingScreen />;
 
@@ -139,7 +190,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left & Center Columns */}
         <div className="lg:col-span-2 space-y-8">
-          <HeatmapWidget activityData={activityData} />
+          <HeatmapWidget activityData={combinedActivityData} />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <LMSPreviewWidget courses={enrolledCourses} navigate={navigate} />
@@ -150,7 +201,13 @@ export default function Dashboard() {
 
           <ActivityLogWidget activities={activities} />
 
-          <TopicBreakdownWidget displayTopics={displayTopics} visibleCount={visibleCount} setVisibleCount={setVisibleCount} stats={stats} navigate={navigate} />
+          <TopicBreakdownWidget 
+            displayTopics={unifiedCurriculum} 
+            visibleCount={visibleCount} 
+            setVisibleCount={setVisibleCount} 
+            stats={stats} 
+            navigate={navigate} 
+          />
         </div>
 
         {/* Right Sidebar */}
@@ -230,6 +287,19 @@ function LMSPreviewWidget({ courses, navigate }: any) {
 }
 
 function ProjectTasksWidget({ tasks, navigate }: any) {
+  const { updateTaskStatus } = useProject();
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const handleStatusUpdate = async (taskId: string, currentStatus: string) => {
+    setUpdatingId(taskId);
+    try {
+      const nextStatus = currentStatus === 'todo' ? 'in-progress' : 'done';
+      await updateTaskStatus(taskId, nextStatus);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -242,16 +312,32 @@ function ProjectTasksWidget({ tasks, navigate }: any) {
           <p className="text-xs text-slate-500 text-center py-4">No pending tasks</p>
         ) : (
           tasks.map((task: any) => (
-            <div key={task.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                task.status === 'revision' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
-              }`}>
-                  {task.status === 'revision' ? <AlertTriangle size={16} /> : <Clock size={16} />}
+            <div key={task.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 group transition-all hover:border-emerald-200 dark:hover:border-emerald-900/30">
+              <div className="flex items-center gap-3 min-w-0">
+                <button 
+                  disabled={updatingId === task.id}
+                  onClick={() => handleStatusUpdate(task.id, task.status)}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                    task.status === 'revision' ? 'bg-rose-100 text-rose-600 hover:bg-rose-200' : 
+                    task.status === 'in-progress' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' :
+                    'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'
+                  }`}
+                >
+                    {updatingId === task.id ? <Loader2 size={14} className="animate-spin" /> : 
+                     task.status === 'in-progress' ? <Play size={14} fill="currentColor" /> : <Clock size={16} />}
+                </button>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{task.title}</p>
+                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Due {formatDate(task.dueDate)}</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{task.title}</p>
-                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Due {formatDate(task.dueDate)}</p>
-              </div>
+              <button 
+                onClick={() => handleStatusUpdate(task.id, 'done')}
+                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-all"
+                title="Mark as Done"
+              >
+                <CheckCircle2 size={18} />
+              </button>
             </div>
           ))
         )}
@@ -293,15 +379,25 @@ function ActiveProjectsWidget({ projects, navigate }: any) {
               onClick={() => navigate(`/project/${project.id}`)}
               className="p-5 rounded-3xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className={`w-2 h-2 rounded-full ${project.status === 'hiring' ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  {project.status === 'hiring' ? 'Recruiting' : 'In Progress'}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${project.status === 'hiring' ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    {project.status === 'hiring' ? 'Recruiting' : 'In Progress'}
+                  </span>
+                </div>
+                <span className="text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
+                  {project.progress || 0}%
                 </span>
               </div>
-              <h4 className="font-black text-slate-900 dark:text-white text-base mb-4 line-clamp-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h4 className="font-black text-slate-900 dark:text-white text-base mb-3 line-clamp-1 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {project.title}
               </h4>
+              
+              <div className="w-full h-1 bg-slate-100 dark:bg-slate-700 rounded-full mb-4 overflow-hidden">
+                <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${project.progress || 0}%` }} />
+              </div>
+
               <div className="flex items-center justify-between">
                 <div className="flex -space-x-2">
                   {project.roles.filter((r: any) => r.assignedUserId).slice(0, 3).map((r: any, i: number) => (
@@ -317,7 +413,10 @@ function ActiveProjectsWidget({ projects, navigate }: any) {
                      </div>
                   )}
                 </div>
-                <ChevronRight size={16} className="text-slate-300 group-hover:text-blue-500 transition-colors transform group-hover:translate-x-1" />
+                <div className="flex items-center gap-1 text-[10px] font-black text-slate-400 uppercase">
+                  <Target size={12} className="text-blue-500" />
+                  {project.milestones?.filter((m: any) => m.status === 'completed').length || 0}/{project.milestones?.length || 0}
+                </div>
               </div>
             </div>
           ))
@@ -418,18 +517,23 @@ function HeatmapWidget({ activityData }: any) {
         targetDate.getMonth() + 1,
         0,
       ).getDate();
-      const monthName = targetDate.toLocaleDateString(undefined, {
+      const startMonth = new Date(today.getFullYear(), today.getMonth() - dateOffset, 1);
+      const totalDays = new Date(startMonth.getFullYear(), startMonth.getMonth() + 1, 0).getDate();
+      const monthName = startMonth.toLocaleDateString(undefined, {
         month: "long",
         year: "numeric",
       });
 
-      const days = [];
-      for (let i = 1; i <= daysInMonth; i++) {
-        const d = new Date(targetDate.getFullYear(), targetDate.getMonth(), i);
+      const days = Array.from({ length: totalDays }, (_, i) => {
+        const d = new Date(startMonth);
+        d.setDate(startMonth.getDate() + i);
         const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-        const score = activityData[dateString] || 0;
-        days.push({ date: d, dateString, score });
-      }
+        return {
+          date: d,
+          dateString,
+          score: activityData[dateString] || 0,
+        };
+      });
 
       return (
         <>
@@ -639,52 +743,67 @@ function TopicBreakdownWidget({
         {visibleTopics.length > 0 ? (
           <>
             {visibleTopics.map((topic: any) => {
-              const theoryWidth =
-                topic.theoryCompleted || topic.isRead ? 100 : 0;
-              const totalQ = topic.totalQuestions || 0;
-              const solvedQ = topic.solvedQuestions || 0;
-              const quizWidth =
-                totalQ > 0 ? Math.round((solvedQ / totalQ) * 100) : 0;
+              const isLms = topic.type === 'lms';
+              const totalQ = topic.totalQuestions || topic.totalItems || 0;
+              const solvedQ = topic.solvedQuestions || topic.completedItems || 0;
+              const quizWidth = totalQ > 0 ? Math.round((solvedQ / totalQ) * 100) : 0;
+              const theoryWidth = isLms ? quizWidth : (topic.theoryCompleted || topic.isRead || topic.solvedQuestions > 0 ? 100 : 0);
 
               return (
                 <div
-                  key={topic._id}
+                  key={topic.unifiedId}
                   className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all group"
                 >
                   <div className="flex justify-between items-center mb-5">
-                    <span className="font-black text-slate-800 dark:text-slate-200 text-lg group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                      {topic.title}
-                    </span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded ${
+                          isLms ? 'bg-fuchsia-100 text-fuchsia-600' : 'bg-blue-100 text-blue-600'
+                        }`}>
+                          {isLms ? 'Course' : 'Practice'}
+                        </span>
+                        {isLms && (
+                          <span className="text-[9px] font-bold text-slate-400 truncate max-w-[150px]">
+                            {topic.courseTitle}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-black text-slate-800 dark:text-slate-200 text-lg group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                        {topic.title}
+                      </span>
+                    </div>
                     <button
-                      onClick={() => navigate(`/config/${topic._id}`)}
-                      className="text-slate-500 hover:text-white text-sm font-bold flex items-center transition-colors bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-violet-600 hover:border-violet-600 dark:hover:bg-violet-500 px-4 py-2 rounded-xl shadow-sm"
+                      onClick={() => navigate(isLms ? `/courses/${topic.courseId}` : `/config/${topic._id}`)}
+                      className={`text-sm font-bold flex items-center transition-colors bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm ${
+                        isLms ? 'hover:bg-fuchsia-600 hover:text-white' : 'hover:bg-blue-600 hover:text-white'
+                      }`}
                     >
-                      Practice <ChevronRight size={16} className="ml-1" />
+                      {isLms ? 'Learn' : 'Practice'} <ChevronRight size={16} className="ml-1" />
                     </button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <div className="flex justify-between text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
-                        <span>Theory Mastery</span>
+                        <span>{isLms ? 'Lessons Completed' : 'Theory Mastery'}</span>
                         <span
                           className={
                             theoryWidth === 100 ? "text-emerald-500" : ""
                           }
                         >
-                          {theoryWidth}%
+                          {isLms ? `${solvedQ}/${totalQ}` : `${theoryWidth}%`}
                         </span>
                       </div>
                       <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700/50">
                         <div
-                          className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                          className={`h-full rounded-full transition-all duration-1000 ${isLms ? 'bg-fuchsia-500' : 'bg-emerald-500'}`}
                           style={{ width: `${theoryWidth}%` }}
                         />
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
-                        <span>Quiz Accuracy</span>
+                        <span>{isLms ? 'Module Progress' : 'Quiz Accuracy'}</span>
                         <span
                           className={quizWidth >= 80 ? "text-violet-500" : ""}
                         >
@@ -693,7 +812,9 @@ function TopicBreakdownWidget({
                       </div>
                       <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700/50">
                         <div
-                          className="h-full bg-linear-to-r from-violet-400 to-violet-600 rounded-full transition-all duration-1000"
+                          className={`h-full bg-linear-to-r rounded-full transition-all duration-1000 ${
+                            isLms ? 'from-fuchsia-400 to-fuchsia-600' : 'from-blue-400 to-blue-600'
+                          }`}
                           style={{ width: `${quizWidth}%` }}
                         />
                       </div>

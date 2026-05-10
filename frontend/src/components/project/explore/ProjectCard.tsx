@@ -2,15 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
-  CheckCircle, 
   BadgeCheck, 
   UserPlus, 
   Activity, 
   CheckCircle2, 
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { Project } from '../../../types';
-import { getUserById, getCohortById } from '../../../data/mockData';
 
 interface ProjectCardProps {
   project: Project;
@@ -36,25 +35,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     }
   };
 
-  // Helper to render the appropriate status badge
+  // Upgraded status badge with inset rings and premium contrast
   const renderStatusBadge = () => {
     switch (project.status) {
       case 'hiring':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-500/20 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-            <UserPlus size={12} /> Hiring
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50/80 dark:bg-amber-500/10 ring-1 ring-inset ring-amber-200/60 dark:ring-amber-500/30 text-[10px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400 shadow-sm">
+            <Sparkles size={12} strokeWidth={2.5} /> Hiring
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/50 dark:border-emerald-500/20 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 size={12} /> Completed
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/80 dark:bg-emerald-500/10 ring-1 ring-inset ring-emerald-200/60 dark:ring-emerald-500/30 text-[10px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 shadow-sm">
+            <CheckCircle2 size={12} strokeWidth={2.5} /> Completed
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-200/50 dark:border-blue-500/20 text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-            <Activity size={12} /> In Progress
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50/80 dark:bg-blue-500/10 ring-1 ring-inset ring-blue-200/60 dark:ring-blue-500/30 text-[10px] font-extrabold uppercase tracking-widest text-blue-600 dark:text-blue-400 shadow-sm">
+            <Activity size={12} strokeWidth={2.5} /> In Progress
           </span>
         );
     }
@@ -67,45 +66,48 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       role="button"
       tabIndex={0}
       aria-label={`View project details for ${project.title}`}
-      className="group relative flex flex-col h-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ease-out hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-blue-300 dark:hover:border-blue-500/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-[#0B1120]"
+      className="group relative flex flex-col h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-[1.5rem] overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.15)] dark:hover:shadow-blue-900/20 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:-translate-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
     >
-      {/* Top Banner Accent */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+      {/* Decorative Glowing Top Accent */}
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Subtle Ambient Glow */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/10 dark:group-hover:bg-blue-500/20 transition-colors duration-500 pointer-events-none" />
 
-      <div className="flex flex-col flex-1 p-5">
+      <div className="relative flex flex-col flex-1 p-6 z-10">
         
         {/* Header: Title & Badges */}
-        <div className="mb-3">
-          <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
-            {project.title}
-          </h3>
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-3.5">
             {renderStatusBadge()}
             {cohort && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                <Layers size={12} /> {cohort.name}
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/80 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 shadow-sm">
+                <Layers size={12} strokeWidth={2.5} /> {cohort.name}
               </span>
             )}
           </div>
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+            {project.title}
+          </h3>
         </div>
 
         {/* Pitch / Description */}
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4 flex-1">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mb-5 flex-1">
           {project.pitch}
         </p>
 
         {/* Tech Stack */}
-        <div className="flex flex-wrap gap-1.5 mb-5">
+        <div className="flex flex-wrap gap-2 mb-6 mt-auto">
           {project.techStack.slice(0, 4).map(tech => (
             <span 
               key={tech} 
-              className="px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 text-[10px] font-bold text-slate-500 dark:text-slate-400"
+              className="px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/50 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 text-[10px] font-bold text-slate-600 dark:text-slate-300"
             >
               {tech}
             </span>
           ))}
           {project.techStack.length > 4 && (
-            <span className="px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+            <span className="px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/50 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 text-[10px] font-bold text-slate-500 dark:text-slate-400">
               +{project.techStack.length - 4}
             </span>
           )}
@@ -113,15 +115,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
         {/* Open Roles Section */}
         {openRoles > 0 && (
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 mb-5">
-            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
-              Available Roles
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 mb-6">
+            <div className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+              <Users size={12} /> Available Roles
             </div>
             <div className="flex flex-wrap gap-2">
               {project.roles.filter(r => !r.filled).map(role => (
                 <span 
                   key={role.id} 
-                  className="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-[11px] font-bold text-blue-600 dark:text-blue-400"
+                  className="px-2.5 py-1 rounded-lg bg-blue-50/50 dark:bg-blue-500/10 ring-1 ring-inset ring-blue-200/60 dark:ring-blue-500/30 text-[11px] font-bold text-blue-700 dark:text-blue-300"
                 >
                   {role.title}
                 </span>
@@ -131,18 +133,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         )}
 
         {/* Footer: Host Info & Team Capacity */}
-        <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+        <div className={`mt-auto pt-5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between ${openRoles === 0 ? 'mt-0' : ''}`}>
           
           {/* Mentor */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             {host?.avatar ? (
               <img 
                 src={host.avatar} 
                 alt={host.name} 
-                className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0" 
+                className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0 shadow-sm" 
               />
             ) : (
-              <div className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-full ring-2 ring-slate-100 dark:ring-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 shadow-sm">
                 <span className="text-xs font-bold text-slate-500">
                   {host?.name?.charAt(0) || '?'}
                 </span>
@@ -150,23 +152,27 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             )}
             
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-slate-900 dark:text-white leading-none mb-1">
+              <span className="text-sm font-extrabold text-slate-900 dark:text-white leading-none mb-1.5">
                 {host?.name || 'Unknown User'}
               </span>
-              {host?.isVerified && (
-                <span className="flex items-center gap-1 text-[10px] font-bold text-blue-500 leading-none">
-                  <BadgeCheck size={12} className="fill-blue-50 text-blue-500 dark:fill-blue-500/20" /> 
+              {host?.isVerified ? (
+                <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest text-blue-600 dark:text-blue-400 leading-none">
+                  <BadgeCheck size={12} className="fill-blue-100 dark:fill-blue-500/20 text-blue-600 dark:text-blue-400" /> 
                   Verified
+                </span>
+              ) : (
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 leading-none">
+                  Mentor
                 </span>
               )}
             </div>
           </div>
 
           {/* Roles Count */}
-          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
-            <Users size={14} className="text-slate-400" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0 bg-slate-50 dark:bg-slate-800/50 px-2.5 py-1.5 rounded-lg ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80">
+            <Users size={14} className="text-slate-400 dark:text-slate-500" />
             <span>
-              <strong className="text-slate-900 dark:text-white">{filledRoles}</strong>/{totalRoles}
+              <strong className="text-slate-900 dark:text-white font-extrabold">{filledRoles}</strong> / {totalRoles}
             </span>
           </div>
 

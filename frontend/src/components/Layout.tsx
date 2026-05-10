@@ -9,7 +9,15 @@ export default function Layout() {
   
   return (
     <>
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-300">
+      <div 
+        className="min-h-screen bg-[#F8FAFC] dark:bg-[#0b0f19] transition-colors duration-300 relative"
+        style={{
+          backgroundImage: `
+            radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 40%)
+          `
+        }}
+      >
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
         <div className="lg:ml-72 flex flex-col min-h-screen">

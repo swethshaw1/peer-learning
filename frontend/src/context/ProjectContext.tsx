@@ -9,11 +9,13 @@ interface ProjectContextType {
   hostedProjects: Project[];
   enrolledProjects: Project[];
   applications: Application[];
+  projectApplications: Application[];
   tasks: Task[];
   activities: ActivityItem[];
   isLoading: boolean;
   refreshData: () => Promise<void>;
   updateApplicationStatus: (appId: string, status: ApplicationStatus) => Promise<void>;
+  fetchProjectApplications: (projectId: string) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   createTask: (data: any) => Promise<void>;
   createProject: (data: any) => Promise<Project>;
@@ -32,7 +34,9 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [enrolledProjects, setEnrolledProjects] = useState<Project[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [projectApplications, setProjectApplications] = useState<Application[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,10 +77,26 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     refreshData();
   }, [refreshData]);
 
+  const fetchProjectApplications = async (projectId: string) => {
+    try {
+      const res = await applicationApi.getByProject(projectId);
+      if (res.data.success) {
+        setProjectApplications(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch project applications', err);
+    }
+  };
+
   const updateApplicationStatus = async (appId: string, status: ApplicationStatus) => {
     try {
-      await applicationApi.updateStatus(appId, status);
+      const res = await applicationApi.updateStatus(appId, status);
       await refreshData();
+      
+      // If we have the project ID from the updated application, refresh that project's pipeline
+      if (res.data?.data?.projectId) {
+        await fetchProjectApplications(res.data.data.projectId);
+      }
     } catch (err) {
       console.error('Failed to update application status', err);
     }
@@ -88,6 +108,15 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       await refreshData();
     } catch (err) {
       console.error('Failed to update task status', err);
+    }
+  };
+
+  const fetchProjectTasks = async (projectId: string) => {
+    try {
+      const res = await taskApi.getByProject(projectId);
+      if (res.data.success) setProjectTasks(res.data.data);
+    } catch (err) {
+      console.error('Failed to fetch project tasks', err);
     }
   };
 
@@ -148,11 +177,15 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         hostedProjects,
         enrolledProjects,
         applications,
+        projectApplications,
         tasks,
+        projectTasks,
         activities,
         isLoading,
         refreshData,
         updateApplicationStatus,
+        fetchProjectApplications,
+        fetchProjectTasks,
         updateTaskStatus,
         createTask,
         createProject,

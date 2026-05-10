@@ -9,7 +9,6 @@ import { courseApi } from '../../api'
 import { Progress, DifficultyBadge, Tag, Spinner } from '../../components/lms/ui'
 import toast from 'react-hot-toast'
 import type { Course, Module } from '../../types'
-import { MOCK_COURSES } from '../../lib/mockData'
 
 const typeIcon = (type: string) => {
   if (type === 'video') return <Play size={14} className="text-blue-400" />
@@ -32,9 +31,7 @@ export default function CourseDetailPage() {
         setCourse(res.data.data)
         if (res.data.data.modules?.[0]) setOpenModules(new Set([res.data.data.modules[0]._id]))
       } catch {
-        const found = MOCK_COURSES.find(c => c._id === id) ?? MOCK_COURSES[0]
-        setCourse(found)
-        if (found.modules?.[0]) setOpenModules(new Set([found.modules[0]._id]))
+        setCourse(null)
       } finally { setLoading(false) }
     }
     load()

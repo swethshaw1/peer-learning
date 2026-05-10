@@ -4,7 +4,6 @@ import { Avatar, Spinner } from '../../components/lms/ui'
 import { useAuthStore } from '../../store/authStore'
 import { Trophy, Medal, Award, Star, TrendingUp } from 'lucide-react'
 import type { LeaderboardEntry } from '../../types'
-import { MOCK_LEADERBOARD } from '../../lib/mockData'
 
 const medalColors = ['text-amber-400', 'text-slate-300', 'text-amber-700']
 const rankBg = ['bg-amber-500/10 border-amber-500/30', 'bg-slate-500/10 border-slate-500/30', 'bg-amber-700/10 border-amber-700/30']
@@ -34,10 +33,9 @@ export default function LeaderboardPage() {
 
     fetchPromise
       .then(r => { 
-        const d = r.data.data ?? []
-        setEntries(d.length ? d : MOCK_LEADERBOARD) 
+        setEntries(r.data.data ?? []) 
       })
-      .catch(() => setEntries(MOCK_LEADERBOARD))
+      .catch(() => setEntries([]))
       .finally(() => setLoading(false))
   }, [activeCohort, cohorts])
 

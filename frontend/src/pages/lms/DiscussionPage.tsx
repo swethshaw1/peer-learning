@@ -5,7 +5,6 @@ import DiscussionCard from '../../components/lms/discussion/DiscussionCard'
 import { Spinner, EmptyState } from '../../components/lms/ui'
 import toast from 'react-hot-toast'
 import type { DiscussionPost } from '../../types'
-import { MOCK_DISCUSSIONS } from '../../lib/mockData'
 
 export default function DiscussionPage() {
   const [posts, setPosts]         = useState<DiscussionPost[]>([])
@@ -19,10 +18,9 @@ export default function DiscussionPage() {
   useEffect(() => {
     discussionApi.getAll()
       .then(r => { 
-        const d = r.data.data ?? []
-        setPosts(d.length ? d : MOCK_DISCUSSIONS) 
+        setPosts(r.data.data ?? []) 
       })
-      .catch(() => setPosts(MOCK_DISCUSSIONS))
+      .catch(() => setPosts([]))
       .finally(() => setLoading(false))
   }, [])
 

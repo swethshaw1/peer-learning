@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Layers } from 'lucide-react';
+import { Search, Filter, Layers, X } from 'lucide-react';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -22,28 +22,31 @@ const FilterBar: React.FC<FilterBarProps> = ({
   onStatusChange,
 }) => {
   return (
-    <div className="flex flex-col gap-5 p-4 md:p-5">
+    <div className="flex flex-col gap-6 p-5 md:p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-[2rem] shadow-xl shadow-slate-200/10 dark:shadow-slate-900/40 animate-in fade-in slide-in-from-top-4 duration-500">
       
       {/* Top Row: Search and Status Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
         
         {/* Search Input */}
-        <div className="relative w-full xl:max-w-md group">
-          <Search 
-            size={18} 
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none" 
-          />
+        <div className="relative w-full xl:max-w-xl group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200/80 dark:border-slate-700/80 group-focus-within:border-blue-500 dark:group-focus-within:border-blue-500 transition-colors pointer-events-none z-10">
+            <Search 
+              size={14} 
+              strokeWidth={2.5}
+              className="text-slate-400 group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors duration-300" 
+            />
+          </div>
           <input
             type="text"
             placeholder="Search projects by title, pitch, or tech stack..."
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-xl pl-11 pr-4 py-2.5 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm"
+            className="w-full bg-slate-50/80 dark:bg-slate-800/40 ring-1 ring-inset ring-slate-200/80 dark:ring-slate-700/80 rounded-[1.25rem] pl-[3.25rem] pr-5 py-3.5 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent focus:bg-white dark:focus:bg-slate-900 transition-all duration-300 hover:ring-slate-300 dark:hover:ring-slate-600"
           />
         </div>
 
         {/* Status Segmented Control */}
-        <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/50 overflow-x-auto hide-scrollbar self-start xl:self-auto">
+        <div className="flex items-center p-1.5 bg-slate-50 dark:bg-slate-800/50 rounded-[1.25rem] ring-1 ring-inset ring-slate-200/60 dark:ring-slate-700/50 overflow-x-auto hide-scrollbar self-start xl:self-auto w-full xl:w-auto">
           {statuses.map(status => {
             const isActive = selectedStatus === status;
             return (
@@ -51,14 +54,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 key={status}
                 onClick={() => onStatusChange(status)}
                 className={`
-                  flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500
+                  flex items-center justify-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-extrabold transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex-1 xl:flex-none
                   ${isActive 
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/50 dark:border-slate-700/50' 
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 border border-transparent'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-slate-200 dark:ring-slate-700' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/40 dark:hover:bg-slate-700/40'
                   }
                 `}
               >
-                {status === 'All' && <Layers size={14} className={isActive ? 'text-blue-500' : 'text-slate-400'} />}
+                {status === 'All' && <Layers size={14} strokeWidth={2.5} className={isActive ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400'} />}
                 {status}
               </button>
             );
@@ -66,16 +69,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="h-px w-full bg-slate-100 dark:bg-slate-800/80" />
+      {/* Elegant Divider */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700/80 to-transparent opacity-70" />
 
       {/* Bottom Row: Skill Toggles */}
-      <div className="flex items-start md:items-center gap-3">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0 pt-2 md:pt-0">
-          <Filter size={14} /> Skills:
+      <div className="flex flex-col md:flex-row md:items-start gap-4">
+        <div className="flex items-center gap-2 text-[11px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0 md:pt-2.5">
+          <Filter size={14} strokeWidth={2.5} /> Skills
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {skills.map(skill => {
             const isActive = selectedSkills.includes(skill);
             return (
@@ -83,10 +86,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 key={skill}
                 onClick={() => onSkillToggle(skill)}
                 className={`
-                  px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900
+                  px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 active:scale-95
                   ${isActive
-                    ? 'bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-400 shadow-sm shadow-blue-500/5'
-                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    ? 'bg-blue-50 dark:bg-blue-500/10 ring-1 ring-inset ring-blue-300 dark:ring-blue-500/30 text-blue-700 dark:text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)]'
+                    : 'bg-white dark:bg-slate-900 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 text-slate-600 dark:text-slate-300 hover:ring-slate-300 dark:hover:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }
                 `}
               >
@@ -95,13 +98,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
             );
           })}
           
-          {/* Helper clear button if skills are selected */}
+          {/* Polished Clear Button */}
           {selectedSkills.length > 0 && (
             <button
-              onClick={() => onSkillToggle('clear_all')} // You can handle this in the parent to clear all
-              className="px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-2 transition-colors ml-1 outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              onClick={() => onSkillToggle('clear_all')}
+              className="group flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all duration-300 ml-1 outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95"
             >
-              Clear Skills
+              <X size={14} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
+              Clear Selection
             </button>
           )}
         </div>
