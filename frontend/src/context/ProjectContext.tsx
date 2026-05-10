@@ -11,11 +11,13 @@ interface ProjectContextType {
   applications: Application[];
   projectApplications: Application[];
   tasks: Task[];
+  projectTasks: Task[];
   activities: ActivityItem[];
   isLoading: boolean;
   refreshData: () => Promise<void>;
   updateApplicationStatus: (appId: string, status: ApplicationStatus) => Promise<void>;
   fetchProjectApplications: (projectId: string) => Promise<void>;
+  fetchProjectTasks: (projectId: string) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   createTask: (data: any) => Promise<void>;
   createProject: (data: any) => Promise<Project>;
@@ -92,7 +94,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     try {
       const res = await applicationApi.updateStatus(appId, status);
       await refreshData();
-      
+
       // If we have the project ID from the updated application, refresh that project's pipeline
       if (res.data?.data?.projectId) {
         await fetchProjectApplications(res.data.data.projectId);

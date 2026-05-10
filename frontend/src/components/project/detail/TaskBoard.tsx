@@ -11,37 +11,37 @@ interface TaskBoardProps {
 
 // Upgraded configuration with premium rings, contrast, and glowing shadows
 const STATUS_CONFIG: Record<string, { icon: React.ElementType, color: string, bg: string, border: string, glow: string }> = {
-  'done': { 
-    icon: CheckCircle2, 
-    color: 'text-emerald-600 dark:text-emerald-400', 
+  'done': {
+    icon: CheckCircle2,
+    color: 'text-emerald-600 dark:text-emerald-400',
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',
     border: 'ring-1 ring-inset ring-emerald-200/80 dark:ring-emerald-500/30',
     glow: 'shadow-[0_0_12px_rgba(16,185,129,0.3)]'
   },
-  'in-review': { 
-    icon: Clock, 
-    color: 'text-amber-600 dark:text-amber-400', 
+  'in-review': {
+    icon: Clock,
+    color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-500/10',
     border: 'ring-1 ring-inset ring-amber-200/80 dark:ring-amber-500/30',
     glow: 'shadow-[0_0_12px_rgba(245,158,11,0.3)]'
   },
-  'revision': { 
-    icon: AlertTriangle, 
-    color: 'text-rose-600 dark:text-rose-400', 
+  'revision': {
+    icon: AlertTriangle,
+    color: 'text-rose-600 dark:text-rose-400',
     bg: 'bg-rose-50 dark:bg-rose-500/10',
     border: 'ring-1 ring-inset ring-rose-200/80 dark:ring-rose-500/30',
     glow: 'shadow-[0_0_12px_rgba(225,29,72,0.3)]'
   },
-  'in-progress': { 
-    icon: Activity, 
-    color: 'text-blue-600 dark:text-blue-400', 
+  'in-progress': {
+    icon: Activity,
+    color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-50 dark:bg-blue-500/10',
     border: 'ring-1 ring-inset ring-blue-200/80 dark:ring-blue-500/30',
     glow: 'shadow-[0_0_12px_rgba(59,130,246,0.3)]'
   },
-  'todo': { 
-    icon: FileText, 
-    color: 'text-slate-500 dark:text-slate-400', 
+  'todo': {
+    icon: FileText,
+    color: 'text-slate-500 dark:text-slate-400',
     bg: 'bg-slate-50 dark:bg-slate-800/50',
     border: 'ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80',
     glow: 'shadow-sm'
@@ -59,7 +59,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
   const { user } = useAuthStore();
   const currentUserId = user?._id || user?.id;
   const project = projects.find(p => p.id === projectId || p._id === projectId);
-  
+
   React.useEffect(() => {
     fetchProjectTasks(projectId);
   }, [projectId]);
@@ -67,7 +67,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
   const [isCreating, setIsCreating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
-  
+
   // Create Task Form State
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -134,7 +134,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-5 shrink-0">
         <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             {projectTasks.length} Tasks
           </span>
           {isHost && (
-            <button 
+            <button
               onClick={() => setIsCreating(!isCreating)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
             >
@@ -167,12 +167,12 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             <h3 className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-2">
               <Plus size={12} strokeWidth={3} /> New Task Assignment
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Title</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="e.g. Design Landing Page"
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
@@ -184,7 +184,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Assignee</label>
                 <div className="relative">
                   <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <select 
+                  <select
                     value={newAssignee}
                     onChange={e => setNewAssignee(e.target.value)}
                     className="w-full bg-slate-50 dark:bg-slate-800/50 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-xl text-sm font-medium py-3.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all appearance-none"
@@ -203,7 +203,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
             <div className="space-y-2">
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Description</label>
-              <textarea 
+              <textarea
                 placeholder="Details, requirements, or links..."
                 value={newDesc}
                 onChange={e => setNewDesc(e.target.value)}
@@ -214,7 +214,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Priority</label>
-                <select 
+                <select
                   value={newPriority}
                   onChange={e => setNewPriority(e.target.value as any)}
                   className="w-full bg-slate-50 dark:bg-slate-800/50 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-xl text-sm font-medium p-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all"
@@ -228,8 +228,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Due Date</label>
                 <div className="relative">
                   <Calendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <input 
-                    type="date" 
+                  <input
+                    type="date"
                     value={newDueDate}
                     onChange={e => setNewDueDate(e.target.value)}
                     className="w-full bg-slate-50 dark:bg-slate-800/50 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-xl text-sm font-medium py-3.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all"
@@ -240,7 +240,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-              <button 
+              <button
                 type="button"
                 onClick={() => setIsCreating(false)}
                 disabled={isSaving}
@@ -248,7 +248,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 type="submit"
                 disabled={isSaving || !newTitle || !newAssignee || !newDueDate}
                 className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.2)] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
@@ -272,7 +272,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             const daysLeft = getDaysUntil(task.dueDate);
             const config = STATUS_CONFIG[task.status] || STATUS_CONFIG['todo'];
             const StatusIcon = config.icon;
-            
+
             const isMyTask = assignee?._id === user?._id || assignee === user?._id;
             const canSubmit = isMyTask && (task.status === 'todo' || task.status === 'in-progress' || task.status === 'revision');
             const isDone = task.status === 'done';
@@ -291,8 +291,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             }
 
             return (
-              <div 
-                key={task.id} 
+              <div
+                key={task._id || task.id}
                 className="space-y-3 animate-in slide-in-from-bottom-8 fade-in fill-mode-both duration-500"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -303,7 +303,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                   hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] dark:hover:shadow-blue-900/20 hover:ring-blue-300/60 dark:hover:ring-blue-500/40 hover:-translate-y-0.5
                   ${isDone ? 'opacity-75 hover:opacity-100 saturate-[0.8] hover:saturate-100' : ''}
                 `}>
-                  
+
                   {/* Status Icon */}
                   <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${config.bg} ${config.border} ${config.color} ${config.glow}`}>
                     <StatusIcon size={20} strokeWidth={2.5} />
@@ -323,7 +323,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
                   {/* Meta & Assignee Area */}
                   <div className="flex flex-wrap lg:flex-nowrap items-center gap-4 shrink-0 pt-3 lg:pt-0 mt-3 lg:mt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800">
-                    
+
                     {/* Badges */}
                     <div className="flex items-center gap-2">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest ${PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG['low']}`}>
@@ -333,7 +333,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                         {getStatusLabel(task.status)}
                       </span>
                     </div>
-                    
+
                     <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden lg:block" />
 
                     {/* Date & User */}
@@ -347,9 +347,9 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
                       {assignee ? (
                         <div className="relative group/avatar">
-                          <img 
-                            src={assignee.avatar} 
-                            alt={assignee.name} 
+                          <img
+                            src={assignee.avatar}
+                            alt={assignee.name}
                             className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700 bg-slate-100 dark:bg-slate-800"
                           />
                           <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-md opacity-0 group-hover/avatar:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
@@ -365,22 +365,24 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
 
                     {/* Submit Button */}
                     {canSubmit && (
-                      <button 
-                        onClick={() => setIsSubmitting(isSubmitting === task.id ? null : task.id)}
-                        className={`ml-1 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-95 ${
-                          isSubmitting === task.id
-                            ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 ring-1 ring-inset ring-slate-200 dark:ring-slate-700'
-                            : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white ring-1 ring-inset ring-blue-200/50 dark:ring-blue-500/30'
-                        }`}
+                      <button
+                        onClick={() => {
+                          const taskId = task._id || task.id;
+                          if (taskId) setIsSubmitting(isSubmitting === taskId ? null : taskId);
+                        }}
+                        className={`ml-1 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-95 ${isSubmitting === (task._id || task.id)
+                          ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 ring-1 ring-inset ring-slate-200 dark:ring-slate-700'
+                          : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white ring-1 ring-inset ring-blue-200/50 dark:ring-blue-500/30'
+                          }`}
                       >
-                        {isSubmitting === task.id ? 'Cancel' : <><Send size={14} /> Submit</>}
+                        {isSubmitting === (task._id || task.id) ? 'Cancel' : <><Send size={14} /> Submit</>}
                       </button>
                     )}
                   </div>
                 </div>
 
                 {/* Inline Submission Form */}
-                {isSubmitting === task.id && (
+                {isSubmitting === (task._id || task.id) && (
                   <div className="ml-4 lg:ml-12 bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm border border-blue-200/60 dark:border-blue-500/30 rounded-[1.5rem] p-5 shadow-lg shadow-blue-500/5 animate-in slide-in-from-top-4 fade-in duration-300">
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Inputs */}
@@ -391,8 +393,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="relative">
                             <ExternalLink size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                            <input 
-                              type="url" 
+                            <input
+                              type="url"
                               placeholder="Project Link (GitHub/Figma/Drive)"
                               value={subFileUrl}
                               onChange={e => setSubFileUrl(e.target.value)}
@@ -400,8 +402,8 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                               required
                             />
                           </div>
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             placeholder="Link Label (e.g. PR #42, V1 Design)"
                             value={subFileName}
                             onChange={e => setSubFileName(e.target.value)}
@@ -409,18 +411,21 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                             required
                           />
                         </div>
-                        <textarea 
+                        <textarea
                           placeholder="Notes for the host (What's done? Any blockers?)..."
                           value={subDesc}
                           onChange={e => setSubDesc(e.target.value)}
                           className="w-full bg-slate-50 dark:bg-slate-800/80 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-xl text-sm font-medium p-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all min-h-[80px] resize-y"
                         />
                       </div>
-                      
+
                       {/* Submit Action */}
                       <div className="flex items-end shrink-0 w-full sm:w-auto">
-                        <button 
-                          onClick={() => handleSubmitWork(task.id)}
+                        <button
+                          onClick={() => {
+                            const taskId = task._id || task.id;
+                            if (taskId) handleSubmitWork(taskId);
+                          }}
                           disabled={isUploading || !subFileUrl || !subFileName}
                           className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.2)] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 h-12"
                         >
@@ -434,7 +439,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Latest Submission View */}
                 {(task.status === 'in-review' || task.status === 'revision' || task.status === 'done') && task.submissions?.length > 0 && (
                   <div className="ml-6 lg:ml-16 flex items-center gap-4 p-3.5 bg-slate-50/80 dark:bg-slate-800/40 ring-1 ring-inset ring-slate-200/50 dark:ring-slate-700/50 rounded-[1.25rem] group/sub">
@@ -443,16 +448,15 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5">Latest Submission</p>
-                      <a href={task.submissions[task.submissions.length-1].fileUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block">
-                        {task.submissions[task.submissions.length-1].fileName}
+                      <a href={task.submissions[task.submissions.length - 1].fileUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block">
+                        {task.submissions[task.submissions.length - 1].fileName}
                       </a>
                     </div>
-                    <span className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest ring-1 ring-inset ${
-                      task.submissions[task.submissions.length-1].reviewStatus === 'approved' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-200/80 dark:ring-emerald-500/30' :
-                      task.submissions[task.submissions.length-1].reviewStatus === 'needs-revision' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 ring-rose-200/80 dark:ring-rose-500/30' :
-                      'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-amber-200/80 dark:ring-amber-500/30'
-                    }`}>
-                      {task.submissions[task.submissions.length-1].reviewStatus}
+                    <span className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest ring-1 ring-inset ${task.submissions[task.submissions.length - 1].reviewStatus === 'approved' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-200/80 dark:ring-emerald-500/30' :
+                      task.submissions[task.submissions.length - 1].reviewStatus === 'needs-revision' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 ring-rose-200/80 dark:ring-rose-500/30' :
+                        'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-amber-200/80 dark:ring-amber-500/30'
+                      }`}>
+                      {task.submissions[task.submissions.length - 1].reviewStatus}
                     </span>
                   </div>
                 )}
@@ -472,7 +476,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ projectId }) => {
             {isHost ? 'Break down your project and assign tasks to your team members to get started.' : 'Tasks and components will appear here once assigned by the host.'}
           </p>
           {isHost && (
-            <button 
+            <button
               onClick={() => setIsCreating(true)}
               className="relative mt-6 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)] active:scale-95"
             >

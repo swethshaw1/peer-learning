@@ -126,7 +126,8 @@ export interface Submission {
 }
 
 export interface Task {
-  id: string;
+  id?: string;
+  _id?: string;
   projectId: string;
   assigneeId: string;
   title: string;
