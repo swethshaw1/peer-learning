@@ -17,16 +17,16 @@ import debugRoute from './routes/debugRoute';
 import notificationRoutes from './routes/notificationRoutes';
 import leaderboardRoute from './routes/leaderboardRoute';
 
-import authRoutes         from './routes/auth';
-import courseRoutes       from './routes/courses';
-import cohortRoutes       from './routes/cohorts';
-import discussionRoutes   from './routes/discussions';
+import authRoutes from './routes/auth';
+import courseRoutes from './routes/courses';
+import cohortRoutes from './routes/cohorts';
+import discussionRoutes from './routes/discussions';
 import lmsLeaderboardRoutes from './routes/leaderboard';
-import bookmarkRoutes     from './routes/bookmarks';
-import dashboardRoutes    from './routes/dashboard';
-import projectRoutes      from './routes/projects';
-import applicationRoutes  from './routes/applications';
-import taskRoutes         from './routes/tasks';
+import bookmarkRoutes from './routes/bookmarks';
+import dashboardRoutes from './routes/dashboard';
+import projectRoutes from './routes/projects';
+import applicationRoutes from './routes/applications';
+import taskRoutes from './routes/tasks';
 
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -39,7 +39,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:5173', process.env.CLIENT_URL || ''],
+    origin: ['http://localhost:5173', 'http://localhost:5174', process.env.CLIENT_URL || ''],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true
   }
@@ -51,7 +51,7 @@ app.use(helmet());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 app.use(cors({
-  origin: ['http://localhost:5173', process.env.CLIENT_URL || ''],
+  origin: ['http://localhost:5173', 'http://localhost:5174', process.env.CLIENT_URL || ''],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
 }));
@@ -113,20 +113,20 @@ app.use('/api/debug', debugRoute);
 app.use('/api/leaderboard', leaderboardRoute); // Quiz leaderboard
 
 // LMS Server Routes
-app.use('/api/auth',        authRoutes);
-app.use('/api/courses',     courseRoutes);
-app.use('/api/cohorts',     cohortRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/cohorts', cohortRoutes);
 app.use('/api/discussions', discussionRoutes);
 app.use('/api/lms-leaderboard', lmsLeaderboardRoutes);
-app.use('/api/bookmarks',   bookmarkRoutes);
-app.use('/api/dashboard',   dashboardRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Project Hub Routes
-app.use('/api/projects',     projectRoutes);
+app.use('/api/projects', projectRoutes);
 app.use('/api/applications', applicationRoutes);
-app.use('/api/tasks',        taskRoutes);
+app.use('/api/tasks', taskRoutes);
 
-const PORT: number = parseInt(process.env.PORT as string, 10) || 5000;
+const PORT: number = parseInt(process.env.PORT as string, 10) || 5050;
 httpServer.listen(PORT, () => {
   console.log(`Server & Sockets running on http://localhost:${PORT}`);
 });

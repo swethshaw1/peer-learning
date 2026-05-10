@@ -45,6 +45,7 @@ export const applyToProject = async (req: Request, res: Response): Promise<void>
     
     res.status(201).json({ success: true, data: application });
   } catch (error: any) {
+    console.error('Application submission error:', error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -93,9 +94,11 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
 
     const project = await Project.findById(application.projectId);
 
-    // If status is 'hired', we should ideally update the Project's role filled status
+    // If status is 'hired', update the Project's role filled status
     if (status === 'hired') {
-      await Project.updateOne(
+      console.log(`Hiring process started for App: ${id}, Project: ${application.projectId}, Role: ${application.roleId}`);
+      
+      const updateResult = await Project.updateOne(
         { _id: application.projectId, 'roles._id': application.roleId },
         { 
           $set: { 
@@ -105,6 +108,9 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
           $inc: { currentParticipants: 1 }
         }
       );
+      if (updateResult.matchedCount === 0) {
+        console.warn(`Warning: No role found in project ${application.projectId} with roleId ${application.roleId}`);
+      }
 
       if (project) {
         await logProjectActivity(

@@ -125,7 +125,7 @@ export const getProjectActivities = async (req: Request, res: Response): Promise
     const transformed = activities.map(a => ({
       ...a,
       id: a._id,
-      read: a.readBy.some((id: any) => id.toString() === userId.toString())
+      read: a.readBy?.some((id: any) => id.toString() === userId.toString()) || false
     }));
       
     res.json({ success: true, data: transformed });
