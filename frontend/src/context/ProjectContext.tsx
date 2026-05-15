@@ -53,7 +53,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const [hRes, eRes, aRes, tRes, nRes, allRes] = await Promise.all([
-        projectApi.getHosted(user._id, { cohortId: activeCohortId }),
+        projectApi.getHosted(user._id),
         projectApi.getEnrolled(user._id, { cohortId: activeCohortId }),
         applicationApi.getByUser(user._id),
         taskApi.getByUser(user._id),

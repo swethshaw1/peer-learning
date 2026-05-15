@@ -12,7 +12,7 @@ interface CreateProjectModalProps {
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
   const { createProject } = useProject();
-  const { cohorts } = useCohort();
+  const { allCohorts } = useCohort();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -161,7 +161,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           className="w-full bg-slate-50 dark:bg-slate-800/40 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-2xl px-5 py-4 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all appearance-none disabled:opacity-60"
                         >
                           <option value="" disabled>Select a Cohort</option>
-                          {cohorts.map(c => (
+                          {allCohorts.map(c => (
                             <option key={c._id} value={c._id}>{c.name}</option>
                           ))}
                         </select>
@@ -193,6 +193,21 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       placeholder="Explain the broader vision, goals, and problem it solves..."
                       disabled={isSubmitting}
                       className="w-full bg-slate-50 dark:bg-slate-800/40 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-2xl px-5 py-4 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all resize-y min-h-[120px] placeholder:text-slate-400 disabled:opacity-60"
+                    />
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <label className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-1">
+                      <AlignLeft size={14} /> Problem Statement <span className="text-rose-500">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={formData.problemStatement}
+                      onChange={e => setFormData({ ...formData, problemStatement: e.target.value })}
+                      placeholder="What specific problem does this project aim to solve?"
+                      disabled={isSubmitting}
+                      className="w-full bg-slate-50 dark:bg-slate-800/40 ring-1 ring-inset ring-slate-200 dark:ring-slate-700/80 rounded-2xl px-5 py-4 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-900 transition-all resize-y min-h-[90px] placeholder:text-slate-400 disabled:opacity-60"
                     />
                   </div>
 
